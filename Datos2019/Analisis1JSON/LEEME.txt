@@ -1,0 +1,3 @@
+- Este proyecto está pensado para ejecutarse con Rstudio.
+- El plan es realizar un análisis exploratorio de datos con uno o más conjuntos de datos en Json.
+- Fase actual: Limpieza de datos (por terminar).
