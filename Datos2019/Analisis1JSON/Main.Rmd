@@ -1,0 +1,500 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+Hola. Esto es una exposición analítica de datos guiada a través de un
+Notebook, por lo que el sentido de esto es seguir la instrucciones que
+vienen a continuación.
+
+Lo primero que debe realizarse es instalar las librerías listadas a
+través de la consola... \* ggplot2 -\> Ayuda a graficar \* jsonlite -\>
+Ayuda a leer jsons \* tidyverse -\> Ayuda a ordenar datos
+
+Se recomienda el uso de R studio, pero en sí, lo necesario es abrir una
+terminal en R y escribir el nombre de la librería a través del siguiente
+comando: 'install.packages("<nombre de la librería>")'
+
+Importamos librerías
+
+```{r}
+library("ggplot2")
+library("jsonlite")
+library("tidyverse") # Este un conjunto de librerías
+```
+
+Leemos json
+
+```{r}
+# Asignamos el json a una variable llamada data
+data <- jsonlite::fromJSON("CDMX_2020-01-14-00_00.json")
+```
+
+Podemos intentar visualizarla con \<str(data)\>, pero esto nos dará un
+pequeño dolor de cabeza por ser demasiados datos. En su lugar, sugiero
+el uso de los comandos 'head' y 'summary'
+
+```{r}
+head(data)
+summary(data)
+
+alerts <- data$alerts
+jams <- data$jams
+users <- data$users
+
+head(alerts)
+head(jams)
+head(users)
+
+summary(alerts) #Demasiada información
+summary(jams)
+summary(users)
+```
+
+Ahora contaremos los NA's por columna y lo añadiremos como una columna
+extra.
+
+```{r}
+alerts$count_na <- rowSums(is.na(alerts))
+jams$count_na <- rowSums(is.na(jams))
+users$count_na <- rowSums(is.na(users))
+
+head(alerts)
+head(jams)
+head(users)
+
+#A quí contamos filas con un valor en la columna 'count_na'
+which(alerts$count_na == 0)
+which(alerts$count_na > 0)
+max(alerts$count_na)
+min(alerts$count_na)
+
+which(jams$count_na == 0)
+which(jams$count_na > 0)
+max(jams$count_na)
+min(jams$count_na)
+
+which(users$count_na == 0)
+which(users$count_na > 0)
+max(users$count_na)
+min(users$count_na)
+
+```
+
+Nótese que este conjunto de datos contiene 3 tablas además de algunos
+datos: alerts, jams y users...
+
+-   alerts: tipo = dataframe columnas = 32 filas = 1260 na's mínimos por
+    columna = 2 na's máximos por columna = 11
+
+-   jams: tipo = dataframe columnas = 28 filas = 143 na's mínimos por
+    columna = 2 na's máximos por columna = 37
+
+-   users: tipo = dataframe columnas = 11 filas = 863 na's mínimos por
+    columna = 0 na's máximos por columna = 0
+
+------------------------------------------------------------------------
+
+Una de las primeras cosas que podemos notar una vez hecho el vistazo a
+la tabla, es que hay valores nulos que pueden eliminarse para limpiar
+los datos, y que estos mismos datos están desordenados. También, podemos
+ver que la columna 'count_na' en users está de sobra.
+
+Supongamos que queremos ordenar estas tablas basándonos primordialmente
+en la cantidad de NA's, y en segundo plano, por nombre de alcaldía.
+
+```{r}
+# MOSTRANDO VALORES CONSIDERABLES A LIMPIAR
+
+# Nótese que los parámetros de 'order' son nuestras columnas de referencia
+sAlerts <- alerts[order(alerts$count_na), ]
+sJams <- jams[order(jams$count_na), ]
+sUsers <- users[order(users$speed , users$mood), ]
+
+head(sAlerts)
+length(which(sAlerts$speed == 0))
+length(which(sAlerts$reportByActiveGroupName != '')) # Esta línea está hecha por contraposición
+length(which(sAlerts$isJamUnifiedAlert == FALSE))
+length(which(sAlerts$nImages == 0))
+length(which(sAlerts$showFacebookPic == FALSE))
+length(which(sAlerts$reportDescription != '')) # Esta línea está hecha por contraposición
+length(which(sAlerts$nearBy != '')) # Contiene una cantidad suficiente a mi punto de vista.
+length(which(sAlerts$additionalInfo != '')) # Esta línea está hecha por contraposición
+length(which(sAlerts$imageUrl != '')) # Esta línea está hecha por contraposición
+length(which(sAlerts$imageId != '')) # Esta línea está hecha por contraposición
+
+head(sJams)
+#length(which(sJams$blockExpiration == "NA")) #Este comando por alguna razón no funciona. Por revisar...
+length(which(sJams$type == "NONE"))
+length(which(sJams$turnType == "NONE"))
+length(which(sJams$blockDescription != '')) # Esta línea está hecha por contraposición
+length(which(sJams$startNode != '')) # Esta línea está hecha por contraposición
+# SI revisamos manualmente el documento, podremos notar que pasa lo mismo con las columnas que comienzan
+# con 'causeAlert...' pero como son demasiadas, nos simplificaremos simplemente a ficharlas para borrar
+
+head(sUsers)
+# Aquí hacemos un descubrimiento
+length(which(sUsers$userName == 'guest'))# 863/863
+length(which(sUsers$ingroup == FALSE))   # 863/863
+length(which(sUsers$ping == '1'))        # 860/863
+length(which(sUsers$magvar == '0'))      # 863/8s63
+length(which(sUsers$inscale == FALSE))   # 18/863
+
+```
+
+Ahora descubrimos lo siguiente: Para 'alerts': Después de contar las
+columnas con más nulos, también descubrimos columnas con datos
+repetitivos. Estas son: 'speed', 'reportByActiveGroupName',
+'isJamUnifiedAlert', 'nImages', 'showFacebookPic', 'reportDescription',
+'additionalInfo', 'imageUrl' e 'imageId'.
+
+Para 'jams': Después de contar las columnas con más nulos, también
+descubrimos columnas con datos repetitivos. Estas son: 'type',
+'turnType', 'blockDescription', 'startNode', 'causeAlert'
+
+Para 'users': A pesar de que esta tabla no tiene datos nulos, sí tiene
+datos redundantes para el análisis, y considero que corresponden a las
+columnas: 'userName', 'ingroup', 'magvar' y 'ping'.
+
+------------------------------------------------------------------------
+
+Para limpiar los valores nulos, procederemos a eliminar las columnas
+que, de tantos valores nulos que tengan, nos den información poco útil.
+
+```{r}
+# BORRANDO DATOS
+
+cleanAlerts <- sAlerts %>% select (-c("speed", "reportByActiveGroupName", "isJamUnifiedAlert", "nImages",
+                                  "showFacebookPic", "reportDescription", "additionalInfo", "imageUrl", "imageId",
+                                  "count_na"))
+
+cleanJams <- sJams %>% select (-c("type", "turnType", "blockDescription", "startNode", "causeAlert", "count_na"))
+head(cleanJams)
+
+
+head(cleanAlerts)
+
+cleanUsers <- sUsers %>% select (-c("userName", "ingroup", "magvar", "ping", "count_na"))
+head(cleanUsers)
+
+```
+
+Procederemos con una segunda limpieza de datos, en esta ocasión el
+profesor nos pidió considerar eliminar algunas columnas en específico
+con información repetida, por ejemplo la columna 'country'.
+
+```{r}
+length(which(cleanAlerts$country == 'MX'))# 1260/1260
+length(which(cleanJams$country == 'MX'))# 143/143
+length(which(cleanUsers$fleet == 'none'))# 863/863
+length(which(cleanUsers$inscale == TRUE))# 845/863
+
+#Procederemos a revisar si existen ID's repetidos
+duplicated(cleanAlerts$id)  # Aparentemente sin ID's repetidos
+duplicated(cleanJams$blockingAlertID)  # Podemos apreciar valores repetidos, pero son los valores 'NA'
+duplicated(cleanUsers$id)  # Aparentemente sin ID's repetidos
+
+## Hora de eliminar las columnas descubiertas.
+
+cleanAlerts <- cleanAlerts %>% select (-c("country"))
+
+cleanJams <- cleanJams %>% select (-c("country"))
+
+cleanUsers <- cleanUsers %>% select (-c("fleet"))
+
+```
+
+################# OPCIONAL #############################
+
+Un último ajuste que sugeriría hacer corresponde a las tablas de alertas
+y usuarios. Podemos observar que contienen una subtabla llamada
+'location', que podríamos dividir en 2 columnas dentro de nuestro
+dataFrame para que otras aplicaciones externas lo manejasen de manera
+más fácil. Considero este paso como OPCIONAL.
+
+```{r}
+cleanAlerts$locationX <- cleanAlerts$location$x
+cleanAlerts$locationY <- cleanAlerts$location$y
+
+cleanAlerts <- cleanAlerts %>% select (-c("location"))
+
+
+cleanUsers$locationX <- cleanUsers$location$x
+cleanUsers$locationY <- cleanUsers$location$y
+
+cleanUsers <- cleanUsers %>% select (-c("location"))
+
+```
+
+¡AHORA LOS DATOS ESTÁN LIMPIOS!
+
+------------------------------------------------------------------------
+
+Una vez preparados para la exploración, procederemos a seguir explorando
+los datos.
+
+```{r}
+head(cleanAlerts)
+head(cleanJams)
+head(cleanUsers)
+
+summary(cleanAlerts) # Muchísima información, muestra datos estadísticos
+summary(cleanJams)
+summary(cleanUsers)
+
+range(cleanAlerts$reportRating)
+range(cleanAlerts$nThumbsUp)
+range(cleanAlerts$reliability)
+range(cleanAlerts$reportMood)
+range(cleanAlerts$nComments)
+range(cleanAlerts$confidence)
+range(cleanAlerts$roadType) # Nos dirá que tiene NA's. Para ello usaremos un modificador...
+range(cleanAlerts$roadType, na.rm=TRUE)
+range(cleanAlerts$magvar)
+range(cleanAlerts$locationX)
+range(cleanAlerts$locationY)
+
+range(cleanJams$speedKMH)
+range(cleanJams$speed)
+range(cleanJams$id)
+range(cleanJams$severity) #Mismo valor siempre... repetitivo pero lo considero escencial.
+range(cleanJams$level)
+range(cleanJams$length)
+range(cleanJams$roadType)
+range(cleanJams$delay)
+
+range(cleanUsers$mood)
+range(cleanUsers$addon)
+range(cleanUsers$speed)
+range(cleanUsers$locationX)
+range(cleanUsers$locationY)
+
+
+# Exploramos datos, buscamos pistas, descubrimos con curiosidad.
+
+
+############ COMPARACIONES ENTRE DATAFRAMES #####################
+
+## cleanAlerts X cleanUsers
+length(which(cleanAlerts$speed == cleanUsers$speed)) # Sin coincidencias en speed
+length(which(cleanAlerts$locationX == cleanUsers$locationX)) # Sin coincidencias en coordenadas X
+length(which(cleanAlerts$locationY == cleanUsers$locationY)) # Sin coincidencias en coordenadas Y
+
+## cleanAlerts X cleanJams
+length(which(cleanAlerts$roadType == cleanJams$roadType)) # Encontramos 279 coincidencias en roadType
+# Para saber qué tan preciso es este dato y qué tanta información puede aportarnos, recurriremos de nuevo al rango...
+range(cleanAlerts$roadType, na.rm=TRUE)
+range(cleanJams$roadType)
+
+# Podemos notar que el rango es considerablemente amplio y que no hay mucha diferencia en el rango de estos campos.
+
+## cleanUsers X cleanJams
+length(which(cleanUsers$speed == cleanJams$speed)) # Encontramos 86 coincidencias en speed, ¡¡La mayoría son ceros!!
+
+########################## Análisis de varianza ########################################
+
+# Mismas columnas que con el rango
+var(cleanAlerts$reportRating, na.rm=TRUE)
+var(cleanAlerts$nThumbsUp, na.rm=TRUE) # Alta varianza...
+var(cleanAlerts$reliability, na.rm=TRUE)
+var(cleanAlerts$reportMood, na.rm=TRUE) # Alta varianza...
+var(cleanAlerts$nComments, na.rm=TRUE) # Baja varianza...
+var(cleanAlerts$confidence, na.rm=TRUE)
+var(cleanAlerts$roadType, na.rm=TRUE) 
+var(cleanAlerts$roadType, na.rm=TRUE)
+var(cleanAlerts$magvar, na.rm=TRUE) # Alta varianza...
+var(cleanAlerts$locationX, na.rm=TRUE) # Baja varianza...
+var(cleanAlerts$locationY, na.rm=TRUE) # Baja varianza...
+
+var(cleanJams$speedKMH, na.rm=TRUE)
+var(cleanJams$speed, na.rm=TRUE)
+var(cleanJams$id, na.rm=TRUE)
+var(cleanJams$severity, na.rm=TRUE) # Varianza = 0
+var(cleanJams$level, na.rm=TRUE)
+var(cleanJams$length, na.rm=TRUE) # Alta varianza... 
+var(cleanJams$roadType, na.rm=TRUE)
+var(cleanJams$delay, na.rm=TRUE) # Alta varianza...
+
+var(cleanUsers$mood, na.rm=TRUE)  # Alta varianza...
+var(cleanUsers$addon, na.rm=TRUE) # Baja varianza...
+var(cleanUsers$speed, na.rm=TRUE)
+var(cleanUsers$locationX, na.rm=TRUE) # Baja varianza...
+var(cleanUsers$locationY, na.rm=TRUE) # Baja varianza...
+
+########################## Desviación estándar ########################################
+
+sd(x=cleanAlerts$reportRating)
+sd(x=cleanAlerts$nThumbsUp) # Desviación > 10 
+sd(x=cleanAlerts$reliability)
+sd(x=cleanAlerts$reportMood) # Desviación > 10
+sd(x=cleanAlerts$nComments) # Desviación < 1 
+sd(x=cleanAlerts$confidence)
+sd(x=cleanAlerts$roadType, na.rm=TRUE) # Nos dirá que tiene NA's. Para ello usaremos un modificador...
+sd(x=cleanAlerts$magvar) # Desviación > 10
+sd(x=cleanAlerts$locationX) # Desviación < 1
+sd(x=cleanAlerts$locationY) # Desviación < 1
+
+sd(x=cleanJams$speedKMH)
+sd(x=cleanJams$speed)
+sd(x=cleanJams$id) # Desviación > 10
+sd(x=cleanJams$severity) # Desviación = 0
+sd(x=cleanJams$level)
+sd(x=cleanJams$length) # Desviación > 10
+sd(x=cleanJams$roadType)
+sd(x=cleanJams$delay) # Desviación > 10
+
+sd(x=cleanUsers$mood) # Desviación > 10
+sd(x=cleanUsers$addon) # Desviación < 1
+sd(x=cleanUsers$speed)
+sd(x=cleanUsers$locationX) # Desviación < 1
+sd(x=cleanUsers$locationY) # Desviación < 1
+
+```
+
+De lo anterior, podemos resumir lo siguiente...
+
+\# cleanAlerts:
+Varianzas altas (\>100): nThumbsUp, reportMood, magvar.
+Varianzas bajas (\<1): nComments, locationX, locationY. 
+Desviaciones altas (\>10): nThumbsUp, reportMood, magvar. 
+Desviaciones bajas (\<1): nComments, locationX, locationY.
+
+\# cleanJams:
+Varianzas altas: length, delay.
+Varianzas bajas: severity (0).
+Desviaciones altas: id, length, delay.
+Desviaciones bajas: severity (0).
+
+\# cleanUsers:
+Varianzas altas: mood.
+Varianzas bajas: addon, locationX, locationY.
+Desviaciones altas: mood.
+Desviaciones bajas: addon, locationX, locationY.
+
+################# FASE GRÁFICA #################################
+
+```{r}
+
+## Graficando descubrimientos de cleanUsers
+
+# Distribución de velocidad media
+ggplot(cleanUsers, aes(x = speed)) +
+  geom_histogram(binwidth = 5, color = "black", fill = "white") +
+  labs(title = "Distribución de velocidad media", x = "Velocidad media", y = "Frecuencia")
+
+# Buscando correlaciones importantes (matriz de correlación)
+cor(cleanUsers[, c("speed", "locationX", "locationY")])
+
+# Media de la velocidad para cada ubicación.
+aggregate(cleanUsers$speed, by = list(cleanUsers$locationX, cleanUsers$locationY), FUN = mean)
+
+
+install.packages("leaflet") #1 vez
+library(leaflet)
+
+leaflet(cleanUsers) %>% # TAL VEZ TENGA PROBLEMAS DE VISUALIZACIÓN
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~locationX, 
+    lat = ~locationY, 
+    radius = ~speed * 10, 
+    color = "gray", 
+    fillOpacity = 0.8,
+    stroke = FALSE
+  )
+
+
+
+
+## Graficando descubrimientos de cleanAlerts
+
+
+
+# 10 reportes con mayor cantidad de comentarios
+head(cleanAlerts[order(cleanAlerts$nComments, decreasing = TRUE), ], 10)
+
+# Esto nos da frecuencias de datos en type.
+table(cleanAlerts$type)
+# Ahora en delegaciones
+table(cleanAlerts$city)
+
+# Creación de mapa
+leaflet(cleanAlerts) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~locationX, 
+    lat = ~locationY, 
+    radius = ~reportRating * 5, 
+    color = "red", 
+    fillOpacity = 0.8,
+    stroke = FALSE
+  )
+
+# Relación entre el tipo de reporte y la calificación del reporte
+aggregate(cleanAlerts$reportRating, by = list(cleanAlerts$type), FUN = mean)
+
+
+# Análisis de correlación
+cor(cleanAlerts[, c("reportRating", "nComments", "confidence")])
+
+# 10 reportes con mayor cantidad de comentarios
+head(cleanAlerts[order(cleanAlerts$nComments, decreasing = TRUE), ], 10)
+
+# Relación entre el tipo de reporte y el nivel de confianza
+aggregate(cleanAlerts$confidence, by = list(cleanAlerts$type), FUN = mean)
+
+
+
+
+## Graficando descubrimientos de cleanJams
+
+
+# Ponemos atención a la columna severity...
+summary(cleanJams$severity)
+# Esto sería muy interesante de analizar si tuviéramos más variedad en los datos.
+
+# Análisis de la longitud del tráfico, distribución de la variable 'length'.
+hist(cleanJams$length, breaks = 20, col = "blue")
+
+# Análisis de correlación
+cor(cleanJams[, c("roadType", "length")])
+
+# Analizámos el porqué de los bloqueos...
+table(cleanJams$blockType)
+
+# Relación entre el largo del tráfico y la severidad
+plot(cleanJams$length, cleanJams$severity, main = "Relación entre el largo del tráfico y la severidad", xlab = "Largo del tráfico", ylab = "Severidad")
+
+# Análisis de la frecuencia de bloqueos en diferentes tipos de pavimento
+table(cleanJams$roadType, cleanJams$blockType)
+
+# Análisis de la relación entre la velocidad media y la severidad del bloqueo
+merged_data <- merge(cleanUsers, cleanJams, by = "id")
+aggregate(merged_data$speed, by = list(merged_data$severity), FUN = mean)
+# Esto puede funcionar mal a causa de falta de correlación entre datos.
+
+```
+
+Por último, tocará almacenar los datos en un nuevo JSON...
+
+```{r}
+# Creamos nuestra lista final
+listaJson <- list(
+  "endTimeMillis" = data$endTimeMillis,
+  "startTimeMillis" = data$startTimeMillis,
+  "startTime" = data$startTime,
+  "endTime" = data$endTime,
+  "alerts" = cleanAlerts,
+  "jams" = cleanJams,
+  "users" = cleanUsers)
+
+print(listaJson)
+
+# Convertimos a Json
+exportJSON <- toJSON(listaJson)
+
+# Escribimos el documento
+write(exportJSON, "clean_data.json")
+
+```
