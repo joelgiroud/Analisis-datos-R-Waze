@@ -1,8 +1,8 @@
 # 📊 Análisis Estadístico de Datos de Movilidad (Waze API)
 
-[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)]()
-[![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)]()
-[![Data Analysis](https://img.shields.io/badge/Data_Analysis-FF6F00?style=for-the-badge&logo=google-analytics&logoColor=white)]()
+![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
+![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)
+![Data Analysis](https://img.shields.io/badge/Data_Analysis-FF6F00?style=for-the-badge&logo=google-analytics&logoColor=white)
 
 ## Descripción del Proyecto
 Este proyecto es una canalización integral de datos (Data Pipeline) desarrollada en **R** para extraer, transformar y analizar registros estructurados en formato **JSON** provenientes de datos de movilidad de Waze. 
