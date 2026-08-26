@@ -1,4 +1,4 @@
-# 📊 Análisis Estadístico de Datos de Movilidad (Waze API)
+Análisis Estadístico de Datos de Movilidad (Waze API)
 
 ![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
 ![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)
