@@ -1,44 +1,47 @@
-Análisis Estadístico de Datos de Movilidad (Waze API)
+# 🚗📊 Waze Traffic Data Pipeline & EDA 
 
-![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white)
-![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)
-![Data Analysis](https://img.shields.io/badge/Data_Analysis-FF6F00?style=for-the-badge&logo=google-analytics&logoColor=white)
+[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)]()
+[![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)]()
+[![Data Analysis](https://img.shields.io/badge/Data_Analysis-FF6F00?style=for-the-badge&logo=google-analytics&logoColor=white)]()
+[![ETL](https://img.shields.io/badge/ETL_Pipeline-4CAF50?style=for-the-badge)]()
 
+##  Descripción del Proyecto
+Este proyecto es una canalización de datos (Data Pipeline) integral desarrollada en **R** para la extracción, transformación y análisis estadístico de registros de movilidad urbana provenientes de archivos **JSON** de Waze.
 
-## Descripción del Proyecto
-Este proyecto es una canalización integral de datos (Data Pipeline) desarrollada en **R** para extraer, transformar y analizar registros estructurados en formato **JSON** provenientes de datos de movilidad de Waze. 
+Desarrollado como parte de la investigación en ciencia de datos dentro de la Universidad Autónoma Metropolitana (UAM), el objetivo principal es diseccionar estructuras de datos complejas para identificar patrones de congestión vehicular, severidad de incidentes y tiempos de retraso.
 
-El objetivo principal de este análisis es [**AQUÍ PON EL OBJETIVO DE NEGOCIO/ESTUDIO, ej: identificar patrones de congestión vehicular, zonas de alto riesgo de accidentes o evaluar los tiempos de respuesta ante alertas de tráfico en la Ciudad de México**].
+A diferencia de un script de análisis tradicional, la arquitectura de este proyecto está modularizada siguiendo las mejores prácticas de **Ingeniería de Software y flujos ETL**, separando las responsabilidades de recolección, limpieza y visualización.
 
-Este desarrollo fue planteado como un proyecto de investigación y ciencia de datos durante mi formación en la Universidad Autónoma Metropolitana (UAM), aplicando bases sólidas de estadística y tratamiento de datos.
+##  Arquitectura del Flujo de Datos (ETL Modular)
 
-## Tecnologías y Librerías Utilizadas
-* **Lenguaje:** R
-* **Manipulación de Datos (ETL):** `dplyr`, `tidyr` (o las que hayas usado para limpiar los datos).
-* **Procesamiento JSON:** `jsonlite` [o la librería exacta que usaste para parsear los JSON].
-* **Visualización:** `ggplot2` [o la que aplique, ej. leaflet para mapas].
-* **Metodología Estadística:** [Ej: Análisis exploratorio de datos (EDA), pruebas de hipótesis, etc.]
+El procesamiento superó el reto de lidiar con estructuras JSON altamente anidadas, dividiendo la ejecución en 4 módulos independientes:
 
-## Arquitectura del Flujo de Datos (ETL)
+1. **`Recoleccion.R` (Extract):** Automatización de la lectura y carga en memoria de los registros JSON crudos.
+2. **`Convert.R` (Transform - Parsing):** Aplanamiento de arrays anidados (Flattening) y transformación de diccionarios JSON a estructuras de datos tabulares y relacionales.
+3. **`Limpieza.R` (Transform - Cleaning):** Normalización de variables geoespaciales, imputación de valores nulos y formateo de series temporales y tipos de datos (ej. conversión de velocidades a KM/H).
+4. **`Analisis.R` & `Main.Rmd` (Load & EDA):** Procesamiento estadístico, análisis exploratorio de datos (EDA) y generación de reportes reproducibles.
 
-El procesamiento superó el reto de lidiar con estructuras JSON altamente anidadas. El flujo se divide en:
-1. **Extracción (Extract):** Lectura masiva de registros JSON crudos simulando peticiones a un endpoint de Waze.
-2. **Transformación (Transform):** Aplanamiento de arrays anidados (Flattening), limpieza de valores nulos, y normalización de variables temporales y geoespaciales utilizando expresiones regulares y lógica vectorial en R.
-3. **Carga y Análisis (Load & Analyze):** Generación de DataFrames estructurados (tipo relacional) listos para la agregación estadística.
+##  Hallazgos y Análisis Visual
+*(Nota: El análisis bivariado y las distribuciones de frecuencia revelan el comportamiento del tráfico en tiempo real)*
 
-##  Hallazgos y Resultados Clave
-A través del análisis estadístico, se descubrió lo siguiente:
-* **Hallazgo 1:** [Ej: El 45% de las alertas de tráfico pesado ("jams") ocurren en un rango de solo 3 horas y están fuertemente correlacionadas con...]
-* **Hallazgo 2:** [Ej: Se logró optimizar el parseo del JSON, reduciendo el tiempo de procesamiento en X% al vectorizar la lectura].
-* **Impacto visual:** [AÑADE AQUÍ UNA IMAGEN. Puedes tomar un screenshot de una gráfica de RStudio que hayas generado y arrastrarla aquí. Es crucial que haya al menos una imagen de tus resultados].
+### Relación entre Severidad y Longitud del Embotellamiento
+![Severidad vs Longitud](plot_severity&&length.png)
+*Análisis bivariado que evalúa cómo la categorización de severidad de Waze se correlaciona con la extensión física del tráfico.*
 
-## Cómo ejecutar este proyecto localmente
+### Distribución de Velocidades y Tiempos de Retraso
+* **Velocidad promedio (KM/H):** Evaluación de la fluidez en incidentes reportados.
+  ![Velocidad KMH](jams$speedKMH.png)
+* **Retraso temporal:** Impacto directo en el tiempo del usuario.
+  ![Retraso](jams$delay.png)
 
-Para reproducir este análisis en tu máquina local:
+### Clasificación de Incidentes
+* **Nivel del embotellamiento:** ![Nivel](jams$level.png)
+* **Tipo de Vía Afectada:** ![Tipo de Vía](jams$roadType.png)
+
+##  Cómo ejecutar este proyecto localmente
+
+Para reproducir este análisis y visualizar el flujo de datos:
 
 1. Clona este repositorio:
    ```bash
    git clone [https://github.com/joelgiroud/Analisis-datos-R-Waze.git](https://github.com/joelgiroud/Analisis-datos-R-Waze.git)
-
-2. Instala las dependencias necesarias en R:
-   install.packages(c("jsonlite", "dplyr", "ggplot2"))
