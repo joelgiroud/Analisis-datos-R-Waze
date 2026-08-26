@@ -32,7 +32,7 @@ A través del análisis estadístico, se descubrió lo siguiente:
 * **Hallazgo 2:** [Ej: Se logró optimizar el parseo del JSON, reduciendo el tiempo de procesamiento en X% al vectorizar la lectura].
 * **Impacto visual:** [AÑADE AQUÍ UNA IMAGEN. Puedes tomar un screenshot de una gráfica de RStudio que hayas generado y arrastrarla aquí. Es crucial que haya al menos una imagen de tus resultados].
 
-## 🚀 Cómo ejecutar este proyecto localmente
+## Cómo ejecutar este proyecto localmente
 
 Para reproducir este análisis en tu máquina local:
 
