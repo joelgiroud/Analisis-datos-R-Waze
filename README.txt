@@ -41,12 +41,3 @@ Para reproducir este análisis en tu máquina local:
 
 2. Instala las dependencias necesarias en R:
    install.packages(c("jsonlite", "dplyr", "ggplot2"))
-
-3. Consejos de oro para este repositorio:
-* Agrega imágenes (Vital):** El 90% de los reclutadores no van a ejecutar tu código. En la sección de "Hallazgos", haz capturas de pantalla de las gráficas que te escupió RStudio y arrástralas al archivo README mientras lo editas en GitHub. Eso hará que el proyecto se vea "terminado".
-
-* El "Traductor" a SQL:** Como mencionaste que eres muy fuerte en SQL, puedes agregar una nota en el README que diga: *"La transformación realizada con dplyr en R simula la lógica de las siguientes consultas SQL complejas (JOINs, Window Functions)..."* para demostrar que dominas ambos mundos.
-
-* Fija (Pin) el repositorio:** Una vez que actualices el README, ve a la página principal de tu GitHub y usa la opción "Customize your pins" para anclar este proyecto hasta arriba.
-
-<FollowUp label="¿Quieres que revisemos cómo responder entrevistas técnicas sobre este código?" query="Hagamos una simulación. Si el líder técnico me pregunta sobre los retos que tuve al aplanar el JSON en R y cómo aseguré la integridad de los datos, ¿cómo debería responder usando el método STAR?"/>
