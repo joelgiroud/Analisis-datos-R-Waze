@@ -21,23 +21,6 @@ El procesamiento superó el reto de lidiar con estructuras JSON altamente anidad
 3. **`Limpieza.R` (Transform - Cleaning):** Normalización de variables geoespaciales, imputación de valores nulos y formateo de series temporales y tipos de datos (ej. conversión de velocidades a KM/H).
 4. **`Analisis.R` & `Main.Rmd` (Load & EDA):** Procesamiento estadístico, análisis exploratorio de datos (EDA) y generación de reportes reproducibles.
 
-##  Hallazgos y Análisis Visual
-*(Nota: El análisis bivariado y las distribuciones de frecuencia revelan el comportamiento del tráfico en tiempo real)*
-
-### Relación entre Severidad y Longitud del Embotellamiento
-![Severidad vs Longitud](plot_severity&&length.png)
-*Análisis bivariado que evalúa cómo la categorización de severidad de Waze se correlaciona con la extensión física del tráfico.*
-
-### Distribución de Velocidades y Tiempos de Retraso
-* **Velocidad promedio (KM/H):** Evaluación de la fluidez en incidentes reportados.
-  ![Velocidad KMH](jams$speedKMH.png)
-* **Retraso temporal:** Impacto directo en el tiempo del usuario.
-  ![Retraso](jams$delay.png)
-
-### Clasificación de Incidentes
-* **Nivel del embotellamiento:** ![Nivel](jams$level.png)
-* **Tipo de Vía Afectada:** ![Tipo de Vía](jams$roadType.png)
-
 ##  Cómo ejecutar este proyecto localmente
 
 Para reproducir este análisis y visualizar el flujo de datos:
